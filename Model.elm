@@ -7,8 +7,8 @@ type alias Model =
   , numCounters : Int 
   }
 
-init : Model
+init : (Model, Cmd a)
 init = 
-  { counts = A.fromList [ 0 ]
+  ({ counts = A.fromList [ 0 ]
   , numCounters = 1 
-  }
+  }, Cmd.none)

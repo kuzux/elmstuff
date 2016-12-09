@@ -9,10 +9,14 @@ import Update exposing (..)
 import Model exposing (..)
 import View exposing (..)
 
+subs : Model -> Sub Msg
+subs model =
+  Sub.none
 
 main = 
-  Html.beginnerProgram
-    { model  = init
-    , view   = view |> Util.bootstrapped
-    , update = update
+  Html.program
+    { init          = init
+    , view          = view |> Util.bootstrapped
+    , update        = update
+    , subscriptions = subs
     }

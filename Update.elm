@@ -11,27 +11,32 @@ type Msg =
   | AddCounter
   | RemoveCounter
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> (Model, Cmd Msg)
 update msg prev = 
   let 
     nth n = A.get n prev.counts |> M.withDefault 0
   in
     case msg of
       Increment n -> 
-        { prev | 
+        ({ prev | 
           counts = A.set n (nth n + 1) prev.counts }
+        , Cmd.none)
       Decrement n ->
-        { prev | 
-          counts = A.set n (nth n - 1 |> Basics.max 0) prev.counts }
+        ({ prev | 
+          counts = A.set n (nth n - 1 |> Basics.max 0) prev.counts 
+        }
+        , Cmd.none)
       AddCounter ->
-        { prev | 
+        ({ prev | 
           numCounters = prev.numCounters + 1
         , counts = A.push 0 prev.counts
         }
+        , Cmd.none)
       RemoveCounter ->
         if prev.numCounters == 0 
-        then prev
-        else { prev | 
+        then (prev, Cmd.none)
+        else ({ prev | 
           numCounters = prev.numCounters - 1
         , counts = A.slice 0 -1 prev.counts
         }
+        , Cmd.none)
