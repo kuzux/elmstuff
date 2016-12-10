@@ -3,6 +3,8 @@ module Update exposing (..)
 import Array as A
 import Maybe as M
 
+import Navigation as N
+
 import Model exposing (..)
 
 type Msg = 
@@ -10,6 +12,7 @@ type Msg =
   | Decrement Int 
   | AddCounter
   | RemoveCounter
+  | UrlChange N.Location
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg prev = 
@@ -40,3 +43,4 @@ update msg prev =
         , counts = A.slice 0 -1 prev.counts
         }
         , Cmd.none)
+      UrlChange _ -> (prev, Cmd.none)

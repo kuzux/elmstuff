@@ -8,13 +8,15 @@ import Html
 import Update exposing (..)
 import Model exposing (..)
 import View exposing (..)
+import Navigation
+
 
 subs : Model -> Sub Msg
 subs model =
   Sub.none
 
 main = 
-  Html.program
+  Navigation.program UrlChange
     { init          = init
     , view          = view |> Util.bootstrapped
     , update        = update
