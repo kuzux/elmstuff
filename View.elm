@@ -13,22 +13,29 @@ import Bootstrap exposing (..)
 import Update exposing (..)
 import Model exposing (..)
 
+issueIsOpen : Issue -> Bool
+issueIsOpen is = is.status /= Closed && is.status /= Wontfix
 
-viewCounter : Int -> Int -> Html Msg
-viewCounter i n = div []
-  [ btn DefaultBtn "+" (Increment i)
-  , btn DefaultBtn "-" (Decrement i)
-  , text " "
-  , text (toString n)
-  ] |> Bootstrap.col Xs 12 |> row
+viewIssue : Issue -> Html Msg 
+viewIssue is = 
+  let 
+    closeIssue id = (ChangeStatus id Closed)
+  in
+    li [] [ p [] [ (toString is.id) ++ ": " ++ is.name |> text
+      , btn Warning "Close" (closeIssue is.id) 
+      ] ]
+
+fst : (a, b) -> a
+fst (a, _) = a
 
 view : Model -> Html Msg
 view model = 
   let
-    indices = L.range 0 (model.numCounters - 1)
-    viewOne i = viewCounter i (A.get i model.counts |> M.withDefault 0)
+    updateFilter str = (FilterTitle str) |> FilterIssues
+    filterForm = Bootstrap.form InlineForm [ TextInput "filter: " updateFilter ]
+    issues = [ ul [] (A.filter issueIsOpen model.issues |> A.map viewIssue |> A.toList |> L.reverse ) ]
+    newIssueForm = Bootstrap.form InlineForm [ TextInput "issue name: " UpdateIssueName 
+      , SubmitButton DefaultBtn "New Issue" (model.newIssueText |> AddIssue)
+      ]
   in
-    div [] ((L.map viewOne indices) ++ 
-      [ btn DefaultBtn "Add Counter" AddCounter
-      , btn DefaultBtn "Remove Counter" RemoveCounter
-      ])
+    [ filterForm ] ++ issues ++ [ newIssueForm ] |> div []

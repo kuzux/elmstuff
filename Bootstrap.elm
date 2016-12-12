@@ -4,7 +4,9 @@ module Bootstrap exposing (..)
 import Html exposing (..)
 import Html.Events exposing (..)
 import Html.Attributes exposing (..)
-import List
+import List as L
+import Char 
+
 
 row : Html a -> Html a
 row child =
@@ -84,7 +86,30 @@ type FormType = DefaultForm
               | InlineForm 
               | HorizontalForm
 
-type FormInput = TextInput String 
-               | PasswordInput String
-               | TextArea String
-               | FileInput String
+type FormInput a = TextInput String (String -> a)
+                 | PasswordInput String (String -> a)
+                 | TextArea String (String -> a)
+                 | SubmitButton BtnType String a
+
+form : FormType -> List (FormInput a) -> Html a
+form typ xs = 
+  let 
+    formClass =
+      case typ of
+        DefaultForm -> ""
+        InlineForm -> "form-inline"
+        HorizontalForm -> "form-horizontal"
+
+    textInputCb fn keycode = keycode |> Char.fromCode |> fn
+
+    showFormInput x =
+      case x of
+        TextInput name onchange ->
+          div [class "form-group"] [ label [] [text name]
+            , input [type_ "text", class "form-control", onInput onchange] []
+            ]
+        SubmitButton typ name callback ->
+          btn typ name callback
+        _ -> div [] []
+  in
+    Html.form [ class formClass ] (L.map showFormInput xs)

@@ -3,14 +3,30 @@ module Model exposing (..)
 import Array as A
 import Navigation as N 
 
+type IssueStatus = Open
+  | Doing
+  | Closed
+  | Wontfix
+
+type alias Issue = 
+  { id : Int
+  , name : String
+  , status : IssueStatus
+  }
+
+type FilterState = ShowAll
+  | FilterTitle String
+  | FilterStatus IssueStatus
 
 type alias Model = 
-  { counts : A.Array Int
-  , numCounters : Int 
+  { issues : A.Array Issue
+  , filter : (String, FilterState)
+  , newIssueText : String
   }
 
 init : N.Location -> (Model, Cmd a)
 init _ = 
-  ({ counts = A.fromList [ 0 ]
-  , numCounters = 1 
+  ({ issues = A.fromList [ ]
+  ,  filter = ("", ShowAll)
+  ,  newIssueText = ""
   }, Cmd.none)
