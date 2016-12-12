@@ -99,9 +99,7 @@ form typ xs =
         DefaultForm -> ""
         InlineForm -> "form-inline"
         HorizontalForm -> "form-horizontal"
-
-    textInputCb fn keycode = keycode |> Char.fromCode |> fn
-
+    
     showFormInput x =
       case x of
         TextInput name onchange ->
@@ -110,6 +108,13 @@ form typ xs =
             ]
         SubmitButton typ name callback ->
           btn typ name callback
-        _ -> div [] []
+        PasswordInput name onchange ->
+          div [class "form-group"] [ label [] [text name]
+            , input [type_ "password", class "form-control", onInput onchange] []
+            ]
+        TextArea name onchange ->
+          div [class "form-group"] [ label [] [text name]
+            , textarea [class "form-control", onInput onchange] []
+            ]
   in
     Html.form [ class formClass ] (L.map showFormInput xs)

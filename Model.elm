@@ -20,13 +20,13 @@ type FilterState = ShowAll
 
 type alias Model = 
   { issues : A.Array Issue
-  , filter : (String, FilterState)
+  , filter : FilterState
   , newIssueText : String
   }
 
 init : N.Location -> (Model, Cmd a)
 init _ = 
   ({ issues = A.fromList [ ]
-  ,  filter = ("", ShowAll)
+  ,  filter = ShowAll
   ,  newIssueText = ""
   }, Cmd.none)

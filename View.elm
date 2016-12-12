@@ -1,4 +1,4 @@
-module View exposing (..)
+module View exposing ( view )
 
 
 import Array as A
@@ -31,9 +31,17 @@ fst (a, _) = a
 view : Model -> Html Msg
 view model = 
   let
+    matches filter issue = 
+      case filter of
+        ShowAll -> 
+          True
+        FilterTitle str ->
+          String.contains str issue.name
+        FilterStatus status ->
+          issue.status == status
     updateFilter str = (FilterTitle str) |> FilterIssues
     filterForm = Bootstrap.form InlineForm [ TextInput "filter: " updateFilter ]
-    issues = [ ul [] (A.filter issueIsOpen model.issues |> A.map viewIssue |> A.toList |> L.reverse ) ]
+    issues = [ ul [] (A.filter issueIsOpen model.issues |> A.filter (matches model.filter) |> A.map viewIssue |> A.toList |> L.reverse ) ]
     newIssueForm = Bootstrap.form InlineForm [ TextInput "issue name: " UpdateIssueName 
       , SubmitButton DefaultBtn "New Issue" (model.newIssueText |> AddIssue)
       ]

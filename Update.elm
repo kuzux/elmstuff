@@ -25,11 +25,15 @@ update msg prev =
         } |> (\i -> A.push i prev.issues))
       }, Cmd.none)
     ChangeStatus id newStatus -> 
-      (prev, Cmd.none)
+      case A.get (id-1) prev.issues of
+        Nothing ->
+          (prev, Cmd.none) -- change to some sort of error
+        Just is ->
+          ({ prev | issues = A.set (id-1) { is | status = newStatus } prev.issues }, Cmd.none)
     UpdateIssueName newName ->
       ({ prev | newIssueText = newName }, Cmd.none)
     FilterIssues state -> 
-      (prev, Cmd.none)
+      ({ prev | filter = state }, Cmd.none)
     UrlChange _ -> 
       (prev, Cmd.none)
     Nop -> 
