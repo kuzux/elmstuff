@@ -16,8 +16,8 @@ import Model exposing (..)
 
 viewCounter : Int -> Int -> Html Msg
 viewCounter i n = div []
-  [ btn Default "+" (Increment i)
-  , btn Default "-" (Decrement i)
+  [ btn DefaultBtn "+" (Increment i)
+  , btn DefaultBtn "-" (Decrement i)
   , text " "
   , text (toString n)
   ] |> Bootstrap.col Xs 12 |> row
@@ -29,6 +29,6 @@ view model =
     viewOne i = viewCounter i (A.get i model.counts |> M.withDefault 0)
   in
     div [] ((L.map viewOne indices) ++ 
-      [ btn Default "Add Counter" AddCounter
-      , btn Default "Remove Counter" RemoveCounter
+      [ btn DefaultBtn "Add Counter" AddCounter
+      , btn DefaultBtn "Remove Counter" RemoveCounter
       ])
