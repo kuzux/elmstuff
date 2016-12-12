@@ -89,6 +89,7 @@ type FormType = DefaultForm
 type FormInput a = TextInput String (String -> a)
                  | PasswordInput String (String -> a)
                  | TextArea String (String -> a)
+                 | SelectMenu String String (List String) (String -> a)
                  | SubmitButton BtnType String a
 
 form : FormType -> List (FormInput a) -> Html a
@@ -99,22 +100,45 @@ form typ xs =
         DefaultForm -> ""
         InlineForm -> "form-inline"
         HorizontalForm -> "form-horizontal"
-    
+
+    generateOptionTag active opt = 
+      option [ value opt, selected (active == opt) ] [ text opt ]
+
     showFormInput x =
       case x of
         TextInput name onchange ->
-          div [class "form-group"] [ label [] [text name]
-            , input [type_ "text", class "form-control", onInput onchange] []
+          div [ class "form-group" ] [ label [] [text name]
+            , input [ type_ "text", class "form-control", onInput onchange ] []
             ]
         SubmitButton typ name callback ->
           btn typ name callback
         PasswordInput name onchange ->
-          div [class "form-group"] [ label [] [text name]
-            , input [type_ "password", class "form-control", onInput onchange] []
+          div [ class "form-group" ] [ label [] [text name]
+            , input [ type_ "password", class "form-control", onInput onchange ] []
+            ]
+        SelectMenu lbl active options callback ->
+          div [ class "form-group" ] [ label [] [text lbl]
+            , Html.select [ class "form-control", onInput callback ] (L.map (generateOptionTag active) options)
             ]
         TextArea name onchange ->
-          div [class "form-group"] [ label [] [text name]
-            , textarea [class "form-control", onInput onchange] []
+          div [ class "form-group" ] [ label [] [text name]
+            , textarea [class "form-control", onInput onchange ] []
             ]
   in
     Html.form [ class formClass ] (L.map showFormInput xs)
+
+select : String -> String -> (List String) -> (String -> a) -> Html a
+select lbl active options callback =
+  let
+    generateOptionTag active opt = 
+      option [ value opt, selected (active == opt) ] [ text opt ]
+  in
+    div [ class "form-group" ] [ label [] [text lbl]
+      , Html.select [ class "form-control", onInput callback ] (L.map (generateOptionTag active) options)
+      ]
+
+textInput : String -> (String -> a) -> Html a
+textInput name onchange =
+  div [ class "form-group" ] [ label [] [text name]
+    , input [ type_ "password", class "form-control", onInput onchange ] []
+    ]

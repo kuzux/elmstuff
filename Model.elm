@@ -18,6 +18,39 @@ type FilterState = ShowAll
   | FilterTitle String
   | FilterStatus IssueStatus
 
+allStatuses : List IssueStatus
+allStatuses = [ Open, Doing, Closed, Wontfix ]
+
+stringToFilter : String -> FilterState
+stringToFilter str =
+  case str of
+    "" -> ShowAll
+    "status:open" -> FilterStatus Open
+    "status:closed" -> FilterStatus Closed 
+    "status:doing" -> FilterStatus Doing 
+    "status:wontfix" -> FilterStatus Wontfix 
+    _ -> FilterTitle str
+
+issueIsOpen : Issue -> Bool
+issueIsOpen is = is.status /= Closed && is.status /= Wontfix
+
+statusToString : IssueStatus -> String
+statusToString st =
+  case st of
+    Open -> "Open"
+    Closed -> "Closed"
+    Doing -> "Doing"
+    Wontfix -> "Wontfix"
+
+stringToStatus : String -> IssueStatus
+stringToStatus str =
+  case str of
+    "Open" -> Open
+    "Closed" -> Closed
+    "Doing" -> Doing
+    "Wontfix" -> Wontfix
+    _ -> Open
+
 type alias Model = 
   { issues : A.Array Issue
   , filter : FilterState
