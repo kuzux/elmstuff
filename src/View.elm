@@ -17,15 +17,12 @@ import Model exposing (..)
 viewIssue : Issue -> Html Msg 
 viewIssue is = 
   let 
-    closeIssue id = (ChangeStatus id Closed)
+    statusStrings = L.map statusToString allStatuses
+    updateStatus str = stringToStatus str |> ChangeStatus is.id
   in
-    li [] [ p [] [ (toString is.id) ++ ": " ++ is.name |> text
-      , btn Warning "Close" (closeIssue is.id)
-      , Bootstrap.form InlineForm [SelectMenu "" (statusToString is.status) (L.map statusToString allStatuses) (\str -> stringToStatus str |> ChangeStatus is.id)]
+    li [] [ p [] [ (toString is.id) ++ ": " ++ is.name |> `text
+      , Bootstrap.form InlineForm [ SelectMenu "" (statusToString is.status) statusStrings updateStatus ]
       ] ]
-
-fst : (a, b) -> a
-fst (a, _) = a
 
 view : Model -> Html Msg
 view model = 
@@ -46,9 +43,14 @@ view model =
       else
         True
     filterForm = Bootstrap.form InlineForm [ TextInput "filter: " updateFilter ]
-    issues = [ ul [] (A.filter filterIssues model.issues |> A.filter (matches model.filter) |> A.map viewIssue |> A.toList |> L.reverse ) ]
-    newIssueForm = Bootstrap.form InlineForm [ TextInput "issue name: " UpdateIssueName 
+    issues = [ ul [] (A.filter filterIssues model.issues 
+      |> A.filter (matches model.filter) 
+      |> A.map viewIssue 
+      |> A.toList 
+      |> L.reverse 
+      ) ]
+    newIssueForm = Bootstrap.form InlineForm [ TextInput "issue name: " UpdateIssueName
       , SubmitButton DefaultBtn "New Issue" (model.newIssueText |> AddIssue)
       ]
   in
-    [ filterForm ] ++ issues ++ [ newIssueForm ] |> div []
+    filterForm :: issues ++ [ newIssueForm ] |> div []

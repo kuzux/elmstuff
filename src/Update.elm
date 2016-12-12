@@ -19,11 +19,15 @@ update : Msg -> Model -> (Model, Cmd Msg)
 update msg prev = 
   case msg of
     AddIssue newName ->
-      ({prev | issues = ({ id = (A.length prev.issues + 1)
-        , name = newName
-        , status = Open
-        } |> (\i -> A.push i prev.issues))
-      }, Cmd.none)
+      case A.filter (\is -> is.name == newName) prev.issues |> A.length of
+        0 ->
+          ({prev | issues = ({ id = (A.length prev.issues + 1)
+            , name = newName
+            , status = Open
+            } |> (\i -> A.push i prev.issues))
+          }, Cmd.none)
+        _ ->
+          (prev, Cmd.none)
     ChangeStatus id newStatus -> 
       case A.get (id-1) prev.issues of
         Nothing ->
