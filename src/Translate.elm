@@ -77,10 +77,36 @@ translate lang str =
           "#" ++ (toString id) ++ ": " ++ name
     French ->
       case str of 
-        _ -> "PAS DE TRADUCTION"
+        Open -> "Ouverte"
+        Closed -> "Fermée"
+        Doing -> "Faisant"
+        Wontfix -> "Pas de Solution"
+        UniqueIssueError -> "C'est déjá une problème avec ce nom."
+        IssueIdError -> "Pas de problème avec cet id."
+        PageNotFound -> "La page n'est pas trouvé"
+        FilterLabel -> "Filtre: "
+        IssueNameLabel -> "Nom de problème"
+        NewIssueLabel -> "Ajouter problème"
+        IssueText id name ->
+          "#" ++ (toString id) ++ " : " ++ name
     Swedish -> 
       case str of 
-        _ -> "INGEN ÖVERSÄTTNING"
+        Open -> "Öppet"
+        Closed -> "Stängd"
+        Doing -> "Görande"
+        Wontfix -> "Ingen Lösning"
+        UniqueIssueError -> "Det er redan ett problem med det namnet"
+        IssueIdError -> "Inget problem med det id-numret"
+        PageNotFound -> "Sida är inte hittades"
+        FilterLabel -> "Filter: "
+        IssueNameLabel -> "Problemsnamn: "
+        NewIssueLabel -> "Skapa problem"
+        IssueText id name ->
+          "#" ++ (toString id) ++ ": " ++ name
     Esperanto ->
       case str of
+        Open -> "Malfermita"
+        Closed -> "Fermita"
+        Doing -> "Farata"
+        Wontfix -> "Nenia Solvo"
         _ -> "NENIA TRADUKO"

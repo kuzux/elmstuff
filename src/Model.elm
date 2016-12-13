@@ -70,7 +70,7 @@ type alias Model =
 init : N.Location -> (Model, Cmd a)
 init loc = 
   let 
-    initLang = Tr.Turkish
+    initLang = Tr.English
     initModel = { issues = A.fromList [ ]
       ,  filter = ShowAll
       ,  newIssueText = ""
