@@ -67,6 +67,20 @@ alert typ value =
   in
     div [ class name ] [ text value ]
 
+dismissibleAlert : BtnType -> String -> a -> Html a
+dismissibleAlert typ value action =
+  let
+    infix = case typ of
+      Success -> "-success"
+      Info    -> "-info"
+      Warning -> "-warning"
+      Danger  -> "-danger"
+      _       -> "-default"
+    name = "alert alert" ++ infix
+  in
+    div [ class name ] [ text value
+      , button [type_ "button", class "close", onClick action ] [ text "×"] ]
+
 jumbotron : List (Html a) -> Html a
 jumbotron children = div [class "jumbotron"] children
 

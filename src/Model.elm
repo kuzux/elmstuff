@@ -55,6 +55,7 @@ type alias Model =
   { issues : A.Array Issue
   , filter : FilterState
   , newIssueText : String
+  , error : Maybe String 
   }
 
 init : N.Location -> (Model, Cmd a)
@@ -62,4 +63,5 @@ init _ =
   ({ issues = A.fromList [ ]
   ,  filter = ShowAll
   ,  newIssueText = ""
+  ,  error = Nothing
   }, Cmd.none)

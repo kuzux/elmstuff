@@ -20,13 +20,17 @@ viewIssue is =
     statusStrings = L.map statusToString allStatuses
     updateStatus str = stringToStatus str |> ChangeStatus is.id
   in
-    li [] [ p [] [ (toString is.id) ++ ": " ++ is.name |> `text
+    li [] [ p [] [ (toString is.id) ++ ": " ++ is.name |> text
       , Bootstrap.form InlineForm [ SelectMenu "" (statusToString is.status) statusStrings updateStatus ]
       ] ]
 
 view : Model -> Html Msg
 view model = 
   let
+    errorMessage =
+        case model.error of
+          Nothing -> div [] []
+          Just error -> Bootstrap.dismissibleAlert Danger error DismissError
     matches filter issue = 
       case filter of
         ShowAll -> 
@@ -43,14 +47,14 @@ view model =
       else
         True
     filterForm = Bootstrap.form InlineForm [ TextInput "filter: " updateFilter ]
-    issues = [ ul [] (A.filter filterIssues model.issues 
+    issues = ul [] (A.filter filterIssues model.issues 
       |> A.filter (matches model.filter) 
       |> A.map viewIssue 
       |> A.toList 
       |> L.reverse 
-      ) ]
+      )
     newIssueForm = Bootstrap.form InlineForm [ TextInput "issue name: " UpdateIssueName
       , SubmitButton DefaultBtn "New Issue" (model.newIssueText |> AddIssue)
       ]
   in
-    filterForm :: issues ++ [ newIssueForm ] |> div []
+    errorMessage :: filterForm :: issues :: [ newIssueForm ] |> div []

@@ -13,7 +13,7 @@ type Msg =
   | UpdateIssueName String
   | FilterIssues FilterState 
   | UrlChange N.Location
-  | Nop
+  | DismissError
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg prev = 
@@ -27,11 +27,11 @@ update msg prev =
             } |> (\i -> A.push i prev.issues))
           }, Cmd.none)
         _ ->
-          (prev, Cmd.none)
+          ({ prev | error = Just "An issue with the same name exists." }, Cmd.none)
     ChangeStatus id newStatus -> 
       case A.get (id-1) prev.issues of
         Nothing ->
-          (prev, Cmd.none) -- change to some sort of error
+          ({ prev | error = Just "No issue with that id." }, Cmd.none) -- change to some sort of error
         Just is ->
           ({ prev | issues = A.set (id-1) { is | status = newStatus } prev.issues }, Cmd.none)
     UpdateIssueName newName ->
@@ -40,5 +40,5 @@ update msg prev =
       ({ prev | filter = state }, Cmd.none)
     UrlChange _ -> 
       (prev, Cmd.none)
-    Nop -> 
-      (prev, Cmd.none)
+    DismissError ->
+      ({ prev | error = Nothing }, Cmd.none)
