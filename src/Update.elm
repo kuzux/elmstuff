@@ -2,6 +2,7 @@ module Update exposing (..)
 
 import Array as A
 import Maybe as M
+import Tuple as T 
 
 import Navigation as N
 
@@ -15,8 +16,11 @@ type Msg =
   | UrlChange N.Location
   | DismissError
 
-update : Msg -> Model -> (Model, Cmd Msg)
-update msg prev = 
+route : N.Location -> (Model, Cmd Msg)
+route = init
+
+updateIssues : Msg -> IssuesModel -> (IssuesModel, Cmd Msg)
+updateIssues msg prev =
   case msg of
     AddIssue newName ->
       case A.filter (\is -> is.name == newName) prev.issues |> A.length of
@@ -42,3 +46,19 @@ update msg prev =
       (prev, Cmd.none)
     DismissError ->
       ({ prev | error = Nothing }, Cmd.none)
+
+update404Page : Msg -> (Model, Cmd Msg)
+update404Page msg = 
+  case msg of
+    UrlChange loc ->
+      route loc
+    _ ->
+      (NotFoundPage, Cmd.none)
+
+update : Msg -> Model -> (Model, Cmd Msg)
+update msg prev = 
+  case prev of
+    NotFoundPage ->
+      update404Page msg
+    IssuesPage isModel ->
+      updateIssues msg isModel |> T.mapFirst IssuesPage

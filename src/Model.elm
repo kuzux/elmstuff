@@ -2,6 +2,8 @@ module Model exposing (..)
 
 import Array as A
 import Navigation as N 
+import String as S 
+
 
 type IssueStatus = Open
   | Doing
@@ -51,17 +53,35 @@ stringToStatus str =
     "Wontfix" -> Wontfix
     _ -> Open
 
-type alias Model = 
+type alias IssuesModel = 
   { issues : A.Array Issue
   , filter : FilterState
   , newIssueText : String
   , error : Maybe String 
   }
 
+type Model = NotFoundPage 
+  | IssuesPage IssuesModel 
+
 init : N.Location -> (Model, Cmd a)
-init _ = 
-  ({ issues = A.fromList [ ]
-  ,  filter = ShowAll
-  ,  newIssueText = ""
-  ,  error = Nothing
-  }, Cmd.none)
+init loc = 
+  let 
+    initModel = { issues = A.fromList [ ]
+      ,  filter = ShowAll
+      ,  newIssueText = ""
+      ,  error = Nothing
+      }
+    dehash str = case S.uncons str of
+      Nothing -> ""
+      Just (x, xs) ->
+        if x == '#'
+        then xs
+        else str
+  in
+    case (dehash loc.hash) of
+      "" ->
+        (IssuesPage initModel, Cmd.none)
+      "/" ->
+        (IssuesPage initModel, Cmd.none)
+      _ -> 
+        (NotFoundPage, Cmd.none)

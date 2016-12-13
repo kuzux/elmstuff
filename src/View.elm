@@ -24,13 +24,13 @@ viewIssue is =
       , Bootstrap.form InlineForm [ SelectMenu "" (statusToString is.status) statusStrings updateStatus ]
       ] ]
 
-view : Model -> Html Msg
-view model = 
+renderIssues : IssuesModel -> Html Msg
+renderIssues model =
   let
     errorMessage =
-        case model.error of
-          Nothing -> div [] []
-          Just error -> Bootstrap.dismissibleAlert Danger error DismissError
+      case model.error of
+        Nothing -> div [] []
+        Just error -> Bootstrap.dismissibleAlert Danger error DismissError
     matches filter issue = 
       case filter of
         ShowAll -> 
@@ -58,3 +58,16 @@ view model =
       ]
   in
     errorMessage :: filterForm :: issues :: [ newIssueForm ] |> div []
+
+render404Page : Html Msg
+render404Page = div [] [ text "Page not found" ]
+
+view : Model -> Html Msg
+view model = 
+  case model of
+    NotFoundPage ->
+      render404Page
+    IssuesPage isModel ->
+      renderIssues isModel
+
+
