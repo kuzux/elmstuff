@@ -7,6 +7,8 @@ import Tuple as T
 import Navigation as N
 
 import Model exposing (..)
+import Translate as Tr
+
 
 type Msg = 
     AddIssue String
@@ -15,50 +17,69 @@ type Msg =
   | FilterIssues FilterState 
   | UrlChange N.Location
   | DismissError
+  | ChangeLanguage Tr.Language
 
 route : N.Location -> (Model, Cmd Msg)
 route = init
 
-updateIssues : Msg -> IssuesModel -> (IssuesModel, Cmd Msg)
-updateIssues msg prev =
-  case msg of
-    AddIssue newName ->
-      case A.filter (\is -> is.name == newName) prev.issues |> A.length of
-        0 ->
-          ({prev | issues = ({ id = (A.length prev.issues + 1)
-            , name = newName
-            , status = Open
-            } |> (\i -> A.push i prev.issues))
-          }, Cmd.none)
-        _ ->
-          ({ prev | error = Just "An issue with the same name exists." }, Cmd.none)
-    ChangeStatus id newStatus -> 
-      case A.get (id-1) prev.issues of
-        Nothing ->
-          ({ prev | error = Just "No issue with that id." }, Cmd.none) -- change to some sort of error
-        Just is ->
-          ({ prev | issues = A.set (id-1) { is | status = newStatus } prev.issues }, Cmd.none)
-    UpdateIssueName newName ->
-      ({ prev | newIssueText = newName }, Cmd.none)
-    FilterIssues state -> 
-      ({ prev | filter = state }, Cmd.none)
-    UrlChange _ -> 
-      (prev, Cmd.none)
-    DismissError ->
-      ({ prev | error = Nothing }, Cmd.none)
+updateIssues : Msg -> Model -> IssuesModel -> Model
+updateIssues msg prev isModel =
+  let 
+    defaultModel x = { prev | page = IssuesPage x }
+  in
+    case msg of
+      AddIssue newName ->
+        case A.filter (\is -> is.name == newName) isModel.issues |> A.length of
+          0 ->
+            { isModel | issues = ({ id = (A.length isModel.issues + 1)
+              , name = newName
+              , status = Open
+              } |> (\i -> A.push i isModel.issues))
+            } |> defaultModel
+          _ ->
+            { isModel | error = Just Tr.UniqueIssueError } |> defaultModel
+      ChangeStatus id newStatus -> 
+        case A.get (id-1) isModel.issues of
+          Nothing ->
+            { isModel | error = Just Tr.IssueIdError } |> defaultModel
+          Just is ->
+            { isModel | issues = A.set (id-1) { is | status = newStatus } isModel.issues } |> defaultModel
+      UpdateIssueName newName ->
+        { isModel | newIssueText = newName } |> defaultModel
+      FilterIssues state -> 
+        { isModel | filter = state } |> defaultModel
+      UrlChange loc -> 
+        route loc |> T.first
+      DismissError ->
+        {isModel | error = Nothing } |> defaultModel
+      ChangeLanguage _ ->
+        isModel |> defaultModel
 
-update404Page : Msg -> (Model, Cmd Msg)
-update404Page msg = 
+update404Page : Msg -> Model -> Model
+update404Page msg prev = 
   case msg of
     UrlChange loc ->
-      route loc
+      route loc |> T.first
     _ ->
-      (NotFoundPage, Cmd.none)
+      prev
+
+updateLanguage : Msg -> Model -> Model 
+updateLanguage msg prev =
+  case msg of 
+    ChangeLanguage newLang ->
+      { prev | lang = newLang }
+    _ ->
+      prev
+
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg prev = 
-  case prev of
-    NotFoundPage ->
-      update404Page msg
-    IssuesPage isModel ->
-      updateIssues msg isModel |> T.mapFirst IssuesPage
+  let 
+    updatePages prev = 
+      case prev.page of
+        NotFoundPage ->
+          update404Page msg prev
+        IssuesPage isModel ->
+          updateIssues msg prev isModel
+  in
+    ((prev |> updatePages |> updateLanguage msg), Cmd.none)

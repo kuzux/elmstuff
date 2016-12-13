@@ -3,7 +3,7 @@ module Model exposing (..)
 import Array as A
 import Navigation as N 
 import String as S 
-
+import Translate as Tr
 
 type IssueStatus = Open
   | Doing
@@ -36,36 +36,41 @@ stringToFilter str =
 issueIsOpen : Issue -> Bool
 issueIsOpen is = is.status /= Closed && is.status /= Wontfix
 
-statusToString : IssueStatus -> String
+statusToString : IssueStatus -> Tr.AppString
 statusToString st =
   case st of
-    Open -> "Open"
-    Closed -> "Closed"
-    Doing -> "Doing"
-    Wontfix -> "Wontfix"
+    Open -> Tr.Open
+    Closed -> Tr.Closed
+    Doing -> Tr.Doing
+    Wontfix -> Tr.Wontfix
 
-stringToStatus : String -> IssueStatus
+stringToStatus : Tr.AppString -> IssueStatus
 stringToStatus str =
   case str of
-    "Open" -> Open
-    "Closed" -> Closed
-    "Doing" -> Doing
-    "Wontfix" -> Wontfix
-    _ -> Open
+    Tr.Open -> Open
+    Tr.Closed -> Closed
+    Tr.Doing -> Doing
+    Tr.Wontfix -> Wontfix
+    _ -> Open  -- should never happen
 
 type alias IssuesModel = 
   { issues : A.Array Issue
   , filter : FilterState
   , newIssueText : String
-  , error : Maybe String 
+  , error : Maybe Tr.AppString 
   }
 
-type Model = NotFoundPage 
+type Page = NotFoundPage 
   | IssuesPage IssuesModel 
+
+type alias Model = 
+  { lang : Tr.Language
+  , page : Page }
 
 init : N.Location -> (Model, Cmd a)
 init loc = 
   let 
+    initLang = Tr.Turkish
     initModel = { issues = A.fromList [ ]
       ,  filter = ShowAll
       ,  newIssueText = ""
@@ -80,8 +85,8 @@ init loc =
   in
     case (dehash loc.hash) of
       "" ->
-        (IssuesPage initModel, Cmd.none)
+        ({ lang = initLang, page = IssuesPage initModel }, Cmd.none)
       "/" ->
-        (IssuesPage initModel, Cmd.none)
+        ({ lang = initLang, page = IssuesPage initModel }, Cmd.none)
       _ -> 
-        (NotFoundPage, Cmd.none)
+        ({ lang = initLang, page = NotFoundPage }, Cmd.none)

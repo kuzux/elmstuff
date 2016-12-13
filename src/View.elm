@@ -12,25 +12,31 @@ import Html.Attributes exposing (..)
 import Bootstrap exposing (..)
 import Update exposing (..)
 import Model exposing (..)
+import Translate as Tr
 
-
-viewIssue : Issue -> Html Msg 
-viewIssue is = 
+viewIssue :  Tr.Language -> Issue -> Html Msg 
+viewIssue lang is = 
   let 
-    statusStrings = L.map statusToString allStatuses
-    updateStatus str = stringToStatus str |> ChangeStatus is.id
+    issueText = 
+      Tr.IssueText is.id is.name |> Tr.translate lang
+    activeStatus =
+      statusToString is.status |> Tr.translate lang
+    statusStrings = 
+      L.map (statusToString >> Tr.translate lang) allStatuses
+    updateStatus str = 
+      Tr.untranslate (Tr.currLanguage) str |> stringToStatus |> ChangeStatus is.id
   in
-    li [] [ p [] [ (toString is.id) ++ ": " ++ is.name |> text
-      , Bootstrap.form InlineForm [ SelectMenu "" (statusToString is.status) statusStrings updateStatus ]
+    li [] [ p [] [ text issueText
+      , Bootstrap.form InlineForm [ SelectMenu "" activeStatus statusStrings updateStatus ]
       ] ]
 
-renderIssues : IssuesModel -> Html Msg
-renderIssues model =
+renderIssues :  Tr.Language -> IssuesModel -> Html Msg
+renderIssues lang model =
   let
     errorMessage =
       case model.error of
         Nothing -> div [] []
-        Just error -> Bootstrap.dismissibleAlert Danger error DismissError
+        Just error -> Bootstrap.dismissibleAlert Danger (error |> Tr.translate lang) DismissError
     matches filter issue = 
       case filter of
         ShowAll -> 
@@ -46,28 +52,26 @@ renderIssues model =
         issueIsOpen is
       else
         True
-    filterForm = Bootstrap.form InlineForm [ TextInput "filter: " updateFilter ]
+    filterForm = Bootstrap.form InlineForm [ TextInput (Tr.FilterLabel |> Tr.translate lang) updateFilter ]
     issues = ul [] (A.filter filterIssues model.issues 
       |> A.filter (matches model.filter) 
-      |> A.map viewIssue 
+      |> A.map (viewIssue lang)
       |> A.toList 
       |> L.reverse 
       )
-    newIssueForm = Bootstrap.form InlineForm [ TextInput "issue name: " UpdateIssueName
-      , SubmitButton DefaultBtn "New Issue" (model.newIssueText |> AddIssue)
+    newIssueForm = Bootstrap.form InlineForm [ TextInput (Tr.IssueNameLabel |> Tr.translate lang) UpdateIssueName
+      , SubmitButton DefaultBtn (Tr.NewIssueLabel |> Tr.translate lang) (model.newIssueText |> AddIssue)
       ]
   in
     errorMessage :: filterForm :: issues :: [ newIssueForm ] |> div []
 
-render404Page : Html Msg
-render404Page = div [] [ text "Page not found" ]
+render404Page : Tr.Language -> Html Msg
+render404Page lang = div [] [ text (Tr.PageNotFound |> Tr.translate lang) ]
 
 view : Model -> Html Msg
 view model = 
-  case model of
+  case model.page of
     NotFoundPage ->
-      render404Page
+      render404Page model.lang
     IssuesPage isModel ->
-      renderIssues isModel
-
-
+      renderIssues model.lang isModel
