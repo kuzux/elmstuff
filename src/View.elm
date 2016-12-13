@@ -14,6 +14,7 @@ import Update exposing (..)
 import Model exposing (..)
 import Translate as Tr
 
+
 viewIssue :  Tr.Language -> Issue -> Html Msg 
 viewIssue lang is = 
   let 
@@ -24,7 +25,7 @@ viewIssue lang is =
     statusStrings = 
       L.map (statusToString >> Tr.translate lang) allStatuses
     updateStatus str = 
-      Tr.untranslate (Tr.currLanguage) str |> stringToStatus |> ChangeStatus is.id
+      Tr.untranslate lang str |> stringToStatus |> ChangeStatus is.id
   in
     li [] [ p [] [ text issueText
       , Bootstrap.form InlineForm [ SelectMenu "" activeStatus statusStrings updateStatus ]

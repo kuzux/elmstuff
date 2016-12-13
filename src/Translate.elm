@@ -61,7 +61,7 @@ translate lang str =
           "#" ++ (toString id) ++ ": " ++ name
     Turkish ->
       -- A bit humorous to translate 'issue' as 'mevzu'
-      -- not an auto-translation error. it is intentional
+      -- not an auto-translation error. It is intentional
       case str of
         Open -> "Açık"
         Closed -> "Kapalı"
@@ -95,9 +95,9 @@ translate lang str =
         Closed -> "Stängd"
         Doing -> "Görande"
         Wontfix -> "Ingen Lösning"
-        UniqueIssueError -> "Det er redan ett problem med det namnet"
+        UniqueIssueError -> "Det finns redan ett problem med det namnet"
         IssueIdError -> "Inget problem med det id-numret"
-        PageNotFound -> "Sida är inte hittades"
+        PageNotFound -> "Sidan är inte hittades"
         FilterLabel -> "Filter: "
         IssueNameLabel -> "Problemsnamn: "
         NewIssueLabel -> "Skapa problem"

@@ -5,6 +5,7 @@ import Navigation as N
 import String as S 
 import Translate as Tr
 
+
 type IssueStatus = Open
   | Doing
   | Closed
