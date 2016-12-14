@@ -72,7 +72,6 @@ updateLanguage msg prev =
     _ ->
       (prev, [ Cmd.none ])
 
-
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg prev = 
   let 
