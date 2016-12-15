@@ -1,0 +1,9 @@
+{
+  "name": "elmstuff",
+  "version": "0.0.1",
+  "description": "Not much",
+  "main": "handlers.js",
+  "dependencies": {
+    "aws-sdk": "^2.7.14"
+  }
+}

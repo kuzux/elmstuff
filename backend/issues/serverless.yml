@@ -20,6 +20,11 @@ service: issues # NOTE: update this with your service name
 provider:
     name: aws
     runtime: nodejs4.3
+    iamRoleStatements:
+        - Effect: "Allow"
+          Action:
+            - "dynamodb:*"
+          Resource: "arn:aws:dynamodb:*:*:table/issues"
 
 # you can overwrite defaults here
 #  stage: dev
@@ -102,3 +107,22 @@ functions:
 #     NewOutput:
 #       Description: "Description for the output"
 #       Value: "Some output value"
+
+
+resources:
+    Resources: 
+        IssueTable:
+            Type: 'AWS::DynamoDB::Table'
+            Properties:
+                AttributeDefinitions:
+                    - 
+                        AttributeName: id
+                        AttributeType: N 
+                KeySchema:
+                    - 
+                        AttributeName: id
+                        KeyType: HASH
+                ProvisionedThroughput:
+                    ReadCapacityUnits: 5
+                    WriteCapacityUnits: 5
+                TableName: issues

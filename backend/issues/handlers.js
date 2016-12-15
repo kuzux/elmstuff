@@ -1,46 +1,54 @@
 'use strict';
 
+var AWS = require('aws-sdk');
+
 module.exports.showAll = (event, context, callback) => {
-  const response = {
-    statusCode: 200,
-    body: JSON.stringify({
-      message: 'Go Serverless v1.0! Your function executed successfully!',
-      input: event,
-    }),
+  var docClient = new AWS.DynamoDB.DocumentClient();
+
+  const params = {
+    TableName: "issues"
   };
+  docClient.scan(params, (error, data) => {
 
-  callback(null, response);
+    if(error) {
+      callback(error);
+    } else {
+      const response = {
+        statusCode: 200,
+        body: JSON.stringify(data.Items)
+      };
 
-  // Use this code if you don't use the http event with the LAMBDA-PROXY integration
-  // callback(null, { message: 'Go Serverless v1.0! Your function executed successfully!', event });
+      callback(null, response);
+    }
+  });
 };
 
 module.exports.create = (event, context, callback) => {
-  const response = {
-    statusCode: 200,
-    body: JSON.stringify({
-      message: 'Go Serverless v1.0! Your function executed successfully!',
-      input: event,
-    }),
-  };
+  var docClient = new AWS.DynamoDB.DocumentClient();
 
-  callback(null, response);
+  var params = JSON.parse(event.body);
+  var item = params;
 
-  // Use this code if you don't use the http event with the LAMBDA-PROXY integration
-  // callback(null, { message: 'Go Serverless v1.0! Your function executed successfully!', event });
+  docClient.put({TableName: 'issues', Item: item}, (error) => {
+    if (error) {
+      callback(error);
+    }
+
+    callback(null, { statusCode: 201 });
+  });
 };
 
 module.exports.update = (event, context, callback) => {
-  const response = {
-    statusCode: 200,
-    body: JSON.stringify({
-      message: 'Go Serverless v1.0! Your function executed successfully!',
-      input: event,
-    }),
-  };
+  var docClient = new AWS.DynamoDB.DocumentClient();
 
-  callback(null, response);
+  var params = JSON.parse(event.body);
+  var item = params;
 
-  // Use this code if you don't use the http event with the LAMBDA-PROXY integration
-  // callback(null, { message: 'Go Serverless v1.0! Your function executed successfully!', event });
+  docClient.update({TableName: 'issues', Item: item}, (error) => {
+    if (error) {
+      callback(error);
+    }
+
+    callback(null, { statusCode: 201 });
+  });
 };
