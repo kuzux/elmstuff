@@ -15,6 +15,9 @@ module.exports.showAll = (event, context, callback) => {
     } else {
       const response = {
         statusCode: 200,
+        headers: {
+          "Access-Control-Allow-Origin" : "*" // Required for CORS support to work
+        },
         body: JSON.stringify(data.Items)
       };
 
@@ -34,7 +37,9 @@ module.exports.create = (event, context, callback) => {
       callback(error);
     }
 
-    callback(null, { statusCode: 201 });
+    callback(null, { statusCode: 201, headers: {
+        "Access-Control-Allow-Origin" : "*" // Required for CORS support to work
+      } });
   });
 };
 
@@ -49,6 +54,12 @@ module.exports.update = (event, context, callback) => {
       callback(error);
     }
 
-    callback(null, { statusCode: 201 });
+    callback(null, { statusCode: 201,  headers: {
+        "Access-Control-Allow-Origin" : "*" // Required for CORS support to work
+      }});
   });
 };
+
+module.exports.cors = (event, context, callback) => {
+  callback(null, { statusCode: 201 , })
+}

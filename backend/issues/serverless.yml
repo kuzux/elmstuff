@@ -63,22 +63,23 @@ functions:
         handler: handlers.showAll
         events:
             - http: 
-                path: users/all
+                path: issues/all
                 method: get
+                cors: true
     createIssue:
         handler: handlers.create
         events:
             - http:
-                path: users/create
+                path: issues/create
                 method: post
+                cors: true
     updateIssue:
         handler: handlers.update
         events:
             - http:
-                path: users/update
+                path: issues/update
                 method: post
-
-
+                cors: true
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events

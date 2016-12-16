@@ -4,20 +4,14 @@ import Array as A
 import Maybe as M
 import Tuple as T 
 
+import Http
 import Navigation as N
 
+import Message exposing (..)
 import Model exposing (..)
+import Init exposing (..)
 import Translate as Tr
 
-
-type Msg = 
-    AddIssue String
-  | ChangeStatus Int IssueStatus
-  | UpdateIssueName String
-  | FilterIssues FilterState 
-  | UrlChange N.Location
-  | DismissError
-  | ChangeLanguage Tr.Language
 
 route : N.Location -> (Model, Cmd Msg)
 route = init
@@ -49,6 +43,10 @@ updateIssues msg prev isModel =
         { isModel | newIssueText = newName } |> defaultModel |> noEffect
       FilterIssues state -> 
         { isModel | filter = state } |> defaultModel |> noEffect
+      LoadIssues (Ok xs) ->
+        { isModel | issues = xs } |> defaultModel |> noEffect
+      LoadIssues (Err _) ->
+        isModel |> defaultModel |> noEffect
       UrlChange loc -> 
         route loc |> T.mapSecond (\x -> [ x ])
       DismissError ->

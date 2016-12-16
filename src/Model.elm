@@ -1,8 +1,8 @@
 module Model exposing (..)
 
+
 import Array as A
-import Navigation as N 
-import String as S 
+
 import Translate as Tr
 
 
@@ -67,27 +67,3 @@ type Page = NotFoundPage
 type alias Model = 
   { lang : Tr.Language
   , page : Page }
-
-init : N.Location -> (Model, Cmd a)
-init loc = 
-  let 
-    initLang = Tr.English
-    initModel = { issues = A.fromList [ ]
-      ,  filter = ShowAll
-      ,  newIssueText = ""
-      ,  error = Nothing
-      }
-    dehash str = case S.uncons str of
-      Nothing -> ""
-      Just (x, xs) ->
-        if x == '#'
-        then xs
-        else str
-  in
-    case (dehash loc.hash) of
-      "" ->
-        ({ lang = initLang, page = IssuesPage initModel }, Cmd.none)
-      "/" ->
-        ({ lang = initLang, page = IssuesPage initModel }, Cmd.none)
-      _ -> 
-        ({ lang = initLang, page = NotFoundPage }, Cmd.none)

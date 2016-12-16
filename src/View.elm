@@ -13,7 +13,9 @@ import Bootstrap exposing (..)
 import Update exposing (..)
 import Model exposing (..)
 import Translate as Tr
+import Message exposing (..)
 
+import Api
 
 viewIssue :  Tr.Language -> Issue -> Html Msg 
 viewIssue lang is = 

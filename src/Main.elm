@@ -6,7 +6,9 @@ import Util
 import Html
 
 import Update exposing (..)
+import Message exposing (..)
 import Model exposing (..)
+import Init exposing (..)
 import View exposing (..)
 import Navigation
 
