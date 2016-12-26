@@ -98,15 +98,7 @@ update msg prev =
 
     (finalState, allCmds) = List.foldl foldUpdates initState updateFns
 
-    reduceCmds : Cmd Msg -> Cmd Msg -> Cmd Msg
-    reduceCmds cmd acc = 
-      if acc == Cmd.none
-      then cmd
-      else if cmd == Cmd.none
-        then acc
-        else Debug.crash "Can't do that (or simply don't know)"
-
     reducedCmds : Cmd Msg
-    reducedCmds = List.foldl reduceCmds Cmd.none allCmds
+    reducedCmds = Cmd.batch allCmds
   in
     (finalState , reducedCmds)
