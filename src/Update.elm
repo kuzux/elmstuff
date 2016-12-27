@@ -21,24 +21,38 @@ updateIssues msg prev isModel =
   let 
     defaultModel x = { prev | page = IssuesPage x }
     noEffect x = (x, [ Cmd.none ])
+    errorOut err = { isModel | error = Just err } |> defaultModel |> noEffect
+    doNothing = isModel |> defaultModel |> noEffect
   in
     case msg of
       AddIssue newName ->
         case A.filter (\is -> is.name == newName) isModel.issues |> A.length of
           0 ->
-            { isModel | issues = ({ id = (A.length isModel.issues + 1)
-              , name = newName
-              , status = Open
-              } |> (\i -> A.push i isModel.issues))
-            } |> defaultModel |> noEffect
+            let
+              addIssue i = A.push i isModel.issues
+              newIssue = { isModel | 
+                issues = ({ id = (A.length isModel.issues + 1)
+                  , name = newName
+                  , status = Open
+                  } |> addIssue)
+                }
+            in 
+              newIssue |> defaultModel |> noEffect
           _ ->
-            { isModel | error = Just Tr.UniqueIssueError } |> defaultModel |> noEffect
+            errorOut Tr.UniqueIssueError
       ChangeStatus id newStatus -> 
         case A.get (id-1) isModel.issues of
           Nothing ->
-            { isModel | error = Just Tr.IssueIdError } |> defaultModel |> noEffect
+            errorOut Tr.IssueIdError
           Just is ->
-            { isModel | issues = A.set (id-1) { is | status = newStatus } isModel.issues } |> defaultModel |> noEffect
+            let
+              newIssues = { isModel | 
+                issues = A.set (id-1) { is | 
+                  status = newStatus 
+                  } isModel.issues 
+                }
+            in 
+              newIssues |> defaultModel |> noEffect
       UpdateIssueName newName ->
         { isModel | newIssueText = newName } |> defaultModel |> noEffect
       FilterIssues state -> 
@@ -50,9 +64,11 @@ updateIssues msg prev isModel =
       UrlChange loc -> 
         route loc |> T.mapSecond (\x -> [ x ])
       DismissError ->
-        {isModel | error = Nothing } |> defaultModel |> noEffect
+        { isModel | error = Nothing } |> defaultModel |> noEffect
       ChangeLanguage _ ->
-        isModel |> defaultModel |> noEffect
+        doNothing
+      Noop ->
+        doNothing
 
 update404Page : Msg -> Model -> (Model, List (Cmd Msg))
 update404Page msg prev = 

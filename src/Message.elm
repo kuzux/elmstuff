@@ -17,3 +17,4 @@ type Msg =
   | UrlChange N.Location
   | DismissError
   | ChangeLanguage Tr.Language
+  | Noop
