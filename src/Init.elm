@@ -28,8 +28,8 @@ init loc =
   in
     case (dehash loc.hash) of
       "" ->
-        ({ lang = initLang, page = IssuesPage initModel }, Api.fetchAllMessages)
+        ({ lang = initLang, page = IssuesPage initModel }, Api.fetchAllIssues)
       "/" ->
-        ({ lang = initLang, page = IssuesPage initModel }, Api.fetchAllMessages)
+        ({ lang = initLang, page = IssuesPage initModel }, Api.fetchAllIssues)
       _ -> 
         ({ lang = initLang, page = NotFoundPage }, Cmd.none)
