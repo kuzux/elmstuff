@@ -31,6 +31,15 @@ addIssue is =
     in
         Http.send (\_ -> Noop) req 
 
+updateIssue : Issue -> Cmd Msg 
+updateIssue is =
+    let
+        url = apiUrl ++ "/issues/update"
+        obj = encodeIssue is |> Http.jsonBody 
+        req = Http.post url obj decodeIssue 
+    in
+        Http.send (\_ -> Noop) req
+
 encodeIssue : Issue -> JS.Value
 encodeIssue is = 
     let
