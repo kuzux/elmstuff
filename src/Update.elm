@@ -11,7 +11,7 @@ import Message exposing (..)
 import Model exposing (..)
 import Init exposing (..)
 import Translate as Tr
-
+import Api 
 
 route : N.Location -> (Model, Cmd Msg)
 route = init
@@ -30,14 +30,13 @@ updateIssues msg prev isModel =
           0 ->
             let
               addIssue i = A.push i isModel.issues
-              newIssue = { isModel | 
-                issues = ({ id = (A.length isModel.issues + 1)
-                  , name = newName
-                  , status = Open
-                  } |> addIssue)
+              newIssue = { id = (A.length isModel.issues + 1)
+                , name = newName
+                , status = Open
                 }
+              newIssues = { isModel | issues = newIssue |> addIssue }
             in 
-              newIssue |> defaultModel |> noEffect
+              (newIssues |> defaultModel, [ Api.addIssue newIssue ] )
           _ ->
             errorOut Tr.UniqueIssueError
       ChangeStatus id newStatus -> 
@@ -46,13 +45,22 @@ updateIssues msg prev isModel =
             errorOut Tr.IssueIdError
           Just is ->
             let
-              newIssues = { isModel | 
-                issues = A.set (id-1) { is | 
-                  status = newStatus 
-                  } isModel.issues 
-                }
+              updateIssue is = { is | status = newStatus }
+              updatedIssue = M.map updateIssue (A.get (id - 1) isModel.issues)
+              newIssues = 
+                case updatedIssue of
+                  Just is ->
+                    { isModel | 
+                      issues = A.set (id-1) is isModel.issues 
+                      }
+                  Nothing ->
+                    isModel
+              effect = 
+                case updatedIssue of
+                  Just is -> Api.updateIssue is
+                  Nothing -> Cmd.none
             in 
-              newIssues |> defaultModel |> noEffect
+              (newIssues |> defaultModel, [ effect ])
       UpdateIssueName newName ->
         { isModel | newIssueText = newName } |> defaultModel |> noEffect
       FilterIssues state -> 
