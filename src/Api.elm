@@ -6,7 +6,6 @@ import Json.Decode exposing (int, string, array, map, Decoder)
 import Json.Decode.Pipeline exposing (..)
 import Json.Encode as JS
 
-
 import Model exposing (Issue, IssueStatus(..))
 import Message exposing (Msg(..))
 

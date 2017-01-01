@@ -18,7 +18,7 @@ module.exports.showAll = (event, context, callback) => {
         headers: {
           "Access-Control-Allow-Origin" : "*" // Required for CORS support to work
         },
-        body: JSON.stringify(data.Items)
+        body: JSON.stringify(data.Items.reverse())
       };
 
       callback(null, response);
@@ -49,7 +49,9 @@ module.exports.update = (event, context, callback) => {
   var params = JSON.parse(event.body);
   var item = params;
 
-  docClient.update({TableName: 'issues', Item: item}, (error) => {
+  item.id = Number(item.id);
+
+  docClient.update({TableName: 'issues', Key: {id: item.id}, Item: item}, (error) => {
     if (error) {
       callback(error);
     }
